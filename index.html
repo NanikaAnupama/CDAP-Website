@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contexta — Context-Aware BI | Group 25-26J-117</title>
+<meta name="description" content="Final-year research project — a context-aware business intelligence system that transitions from static automation to intelligent insight generation." />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+<style>
+  :root {
+    /* iOS-inspired palette */
+    --ink: #1d1d1f;
+    --muted: #86868b;
+    --muted-2: #6e6e73;
+    --paper: #ffffff;
+    --panel: #f5f5f7;
+    --panel-2: #fbfbfd;
+    --border: rgba(0,0,0,0.08);
+    --border-soft: rgba(0,0,0,0.04);
+    --accent: #0071e3;       /* iOS blue */
+    --accent-dark: #0058b0;
+    --accent-soft: #eaf4ff;
+    --accent-2: #34c759;     /* iOS green */
+    --warn: #ff9f0a;         /* iOS orange */
+    --pink: #ff375f;
+    --purple: #af52de;
+  }
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 { letter-spacing: -0.025em; font-weight: 600; }
+
+  /* ---------- Header (iOS-style translucent) ---------- */
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 997;
+    padding: 12px 0; transition: all .35s ease;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid transparent;
+  }
+  #header.scrolled { border-bottom-color: var(--border-soft); }
+  #header .logo a { color: var(--ink); font-weight: 600; font-size: 18px; letter-spacing: -0.02em; }
+  #header .nav-menu a {
+    color: var(--ink); font-weight: 400; font-size: 13px;
+    padding: 6px 12px; border-radius: 980px; transition: all .25s ease;
+    opacity: 0.85;
+  }
+  #header .nav-menu a:hover { opacity: 1; background: rgba(0,0,0,0.04); }
+  #header .nav-menu a.active { color: var(--accent); opacity: 1; font-weight: 500; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 92vh;
+    background:
+      radial-gradient(1200px 600px at 20% 10%, rgba(0,113,227,0.08), transparent 60%),
+      radial-gradient(900px 500px at 85% 90%, rgba(175,82,222,0.06), transparent 60%),
+      linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--accent);
+    padding: 6px 14px; border-radius: 980px;
+    background: rgba(0,113,227,0.08);
+    margin-bottom: 28px;
+  }
+  .hero-title {
+    font-size: clamp(44px, 7vw, 80px);
+    font-weight: 700; line-height: 1.05;
+    letter-spacing: -0.045em; color: var(--ink);
+  }
+  .hero-title .grad {
+    background: linear-gradient(135deg, #0071e3 0%, #af52de 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    font-size: clamp(18px, 2vw, 22px); font-weight: 400;
+    color: var(--muted-2); max-width: 720px;
+    line-height: 1.5; margin-top: 24px;
+  }
+
+  /* iOS pill buttons */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 980px;
+    background: var(--accent); color: #fff;
+    font-weight: 500; font-size: 15px;
+    transition: all .2s ease;
+  }
+  .btn-primary:hover { background: var(--accent-dark); transform: scale(1.02); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 980px;
+    background: rgba(0,0,0,0.05); color: var(--ink);
+    font-weight: 500; font-size: 15px;
+    transition: all .2s ease;
+  }
+  .btn-ghost:hover { background: rgba(0,0,0,0.08); }
+
+  /* ---------- Section title ---------- */
+  .section-eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 600;
+    color: var(--accent); letter-spacing: 0.02em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: clamp(32px, 4.5vw, 48px); font-weight: 700;
+    letter-spacing: -0.035em; line-height: 1.1; color: var(--ink);
+    max-width: 800px;
+  }
+  .section-sub {
+    font-size: 18px; color: var(--muted-2); max-width: 720px;
+    margin-top: 16px; line-height: 1.55;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: 22px;
+    padding: 28px;
+    transition: all .35s cubic-bezier(.2,.8,.2,1);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    border-color: var(--border);
+  }
+  .card-soft {
+    background: var(--panel);
+    border-radius: 22px;
+    padding: 32px;
+  }
+
+  /* Feature card with iOS-style icon */
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .feature-icon.blue   { background: linear-gradient(135deg, #0071e3, #54a8ff); }
+  .feature-icon.purple { background: linear-gradient(135deg, #af52de, #d68dff); }
+  .feature-icon.green  { background: linear-gradient(135deg, #34c759, #6fdf8c); }
+  .feature-icon.orange { background: linear-gradient(135deg, #ff9f0a, #ffc56c); }
+
+  /* Doc card (iOS style) */
+  .doc-card {
+    background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: 22px;
+    padding: 24px;
+    transition: all .35s cubic-bezier(.2,.8,.2,1);
+    display: flex; flex-direction: column; height: 100%;
+  }
+  .doc-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+    border-color: var(--border);
+  }
+  .doc-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 16px;
+  }
+  .doc-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: auto; padding: 8px 16px;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 980px; font-weight: 500; font-size: 13px;
+    transition: all .2s ease; align-self: flex-start;
+  }
+  .doc-btn:hover { background: var(--accent); color: #fff; }
+  .doc-btn.disabled { background: var(--panel); color: var(--muted); cursor: not-allowed; pointer-events: none; }
+
+  /* Tech chip */
+  .tech-chip {
+    padding: 10px 18px; background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: 980px;
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    transition: all .25s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .tech-chip:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .tech-chip i { color: var(--accent); }
+
+  /* Timeline (iOS-style minimalist) */
+  .timeline { position: relative; padding: 20px 0; }
+  .timeline::before {
+    content: ''; position: absolute; left: 14px; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .tl-item {
+    position: relative; padding-left: 48px; margin-bottom: 28px;
+  }
+  .tl-dot {
+    position: absolute; left: 8px; top: 18px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--paper); border: 2px solid var(--accent);
+  }
+  .tl-card {
+    background: var(--paper); border: 1px solid var(--border-soft);
+    border-radius: 18px; padding: 20px 24px;
+    transition: all .25s ease;
+  }
+  .tl-card:hover { border-color: var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+  .tl-date { font-size: 13px; color: var(--accent); font-weight: 500; }
+  .tl-title { font-size: 16px; font-weight: 600; margin-top: 4px; color: var(--ink); }
+  .tl-mark {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 980px;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 12px; font-weight: 600; margin-top: 10px;
+  }
+  .tl-badges { display: inline-flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tl-badge {
+    font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 980px;
+    background: var(--panel); color: var(--muted-2);
+  }
+  .tl-badge.group { background: rgba(52,199,89,0.12); color: #1f8a3a; }
+  .tl-badge.indiv { background: rgba(255,159,10,0.12); color: #b25f00; }
+
+  /* Domain tabs */
+  .tab-btn {
+    padding: 12px 16px; background: transparent;
+    border: none; text-align: left; width: 100%;
+    font-weight: 500; font-size: 14px; color: var(--muted-2);
+    cursor: pointer; border-radius: 12px; transition: all .2s ease;
+    margin-bottom: 4px;
+  }
+  .tab-btn:hover { background: var(--panel); color: var(--ink); }
+  .tab-btn.active { background: var(--accent); color: #fff; }
+  .tab-panel { display: none; animation: fadeIn .3s ease; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Achievement */
+  .achieve-card {
+    background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: 22px; padding: 28px; height: 100%;
+    transition: all .35s ease;
+  }
+  .achieve-card:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+
+  /* Team */
+  .team-card {
+    background: var(--paper);
+    border: 1px solid var(--border-soft);
+    border-radius: 22px; overflow: hidden;
+    transition: all .35s ease;
+  }
+  .team-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+  .team-avatar {
+    aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 64px; color: #fff;
+  }
+  .team-avatar.a1 { background: linear-gradient(135deg, #0071e3, #54a8ff); }
+  .team-avatar.a2 { background: linear-gradient(135deg, #af52de, #d68dff); }
+  .team-avatar.a3 { background: linear-gradient(135deg, #34c759, #6fdf8c); }
+  .team-avatar.a4 { background: linear-gradient(135deg, #ff9f0a, #ffc56c); }
+  .team-avatar.sup { background: linear-gradient(135deg, #6e6e73, #a0a0a5); }
+  .team-body { padding: 22px 20px; text-align: center; }
+  .team-body h4 { font-size: 17px; margin-bottom: 4px; }
+  .team-body .role {
+    color: var(--accent); font-size: 12px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px;
+  }
+  .team-body p { font-size: 13px; color: var(--muted-2); line-height: 1.5; }
+  .social-row { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+  .social-row a {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--panel); display: flex; align-items: center; justify-content: center;
+    color: var(--muted-2); font-size: 14px; transition: all .2s ease;
+  }
+  .social-row a:hover { background: var(--accent); color: #fff; }
+
+  /* Contact */
+  .contact-info {
+    background: var(--paper); padding: 22px; border-radius: 18px;
+    border: 1px solid var(--border-soft); display: flex; gap: 14px; align-items: flex-start;
+    transition: all .25s ease;
+  }
+  .contact-info:hover { border-color: var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
+  .contact-info-icon {
+    width: 42px; height: 42px; border-radius: 12px; background: var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--accent); flex-shrink: 0;
+  }
+  .contact-form input, .contact-form textarea {
+    width: 100%; padding: 14px 16px; border: 1px solid var(--border-soft);
+    border-radius: 12px; font-family: inherit; font-size: 14px;
+    background: var(--paper); transition: all .2s ease;
+    color: var(--ink);
+  }
+  .contact-form input:focus, .contact-form textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+  }
+  .submit-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 12px 28px; border-radius: 980px; font-weight: 500;
+    font-family: inherit; cursor: pointer; transition: all .2s ease;
+    font-size: 15px;
+  }
+  .submit-btn:hover { background: var(--accent-dark); transform: scale(1.02); }
+
+  /* Footer */
+  footer { background: var(--panel); color: var(--muted-2); }
+  footer a { color: var(--muted-2); transition: color .2s; }
+  footer a:hover { color: var(--accent); }
+  footer h5 { color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 14px; }
+
+  /* Back to top */
+  #back-to-top {
+    position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px;
+    border-radius: 50%; background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    color: var(--accent); border: 1px solid var(--border-soft);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    opacity: 0; pointer-events: none; transition: opacity .3s ease;
+    z-index: 996;
+  }
+  #back-to-top.visible { opacity: 1; pointer-events: auto; }
+
+  /* Mobile nav */
+  .mobile-nav-toggle { display: none; }
+  @media (max-width: 991px) {
+    .nav-menu { display: none !important; }
+    .mobile-nav-toggle { display: block; font-size: 24px; color: var(--ink); cursor: pointer; }
+    .mobile-menu-open .nav-menu {
+      display: flex !important; position: absolute; top: 100%; left: 0; right: 0;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+      flex-direction: column; padding: 16px; gap: 4px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border-top: 1px solid var(--border-soft);
+    }
+    .mobile-menu-open .nav-menu a { padding: 10px 16px; border-radius: 12px; }
+    .mobile-menu-open .nav-menu a:hover { background: var(--panel); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header id="header">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <div class="logo">
+      <a href="#hero" class="flex items-center gap-2">
+        <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+          <rect x="3" y="3" width="34" height="34" rx="9" fill="#0071e3"/>
+          <path d="M12 26 L12 18 L16 22 L20 14 L24 24 L28 16 L28 26" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span>Contexta</span>
+      </a>
+    </div>
+    <nav class="nav-menu hidden lg:flex items-center gap-1">
+      <a href="#hero" class="active">Home</a>
+      <a href="#about">About</a>
+      <a href="#documents">Documents</a>
+      <a href="#presentations">Presentations</a>
+      <a href="#milestones">Milestones</a>
+      <a href="#domain">Domain</a>
+      <a href="#achievements">Achievements</a>
+      <a href="#commercialisation">Pricing</a>
+      <a href="#team">Team</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <i class="bi bi-list mobile-nav-toggle" id="menuToggle"></i>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="hero" class="hero flex items-center">
+  <div class="max-w-7xl mx-auto px-6 py-32 w-full">
+    <div class="hero-eyebrow">
+      <i class="bi bi-stars"></i> Research Group 25-26J-117 · SLIIT Faculty of Computing
+    </div>
+    <h1 class="hero-title">
+      Contexta.<br><span class="grad">Context-aware BI.</span>
+    </h1>
+    <p class="hero-sub">
+      Transitioning from static automation to intelligent insight generation. An AI-driven business assistant that adapts to your data — categorising, analysing, forecasting, and explaining.
+    </p>
+    <div class="flex flex-wrap gap-3 mt-10">
+      <a href="#about" class="btn-primary">Explore the system <i class="bi bi-arrow-right"></i></a>
+      <a href="#documents" class="btn-ghost"><i class="bi bi-file-earmark-arrow-down"></i> Download documents</a>
+    </div>
+    <div class="mt-20 flex flex-wrap items-center gap-10 text-sm">
+      <div>
+        <div class="text-3xl font-semibold text-[color:var(--ink)]">04</div>
+        <div class="text-[color:var(--muted)]">Core modules</div>
+      </div>
+      <div class="w-px h-10 bg-[color:var(--border)]"></div>
+      <div>
+        <div class="text-3xl font-semibold text-[color:var(--ink)]">100%</div>
+        <div class="text-[color:var(--muted)]">Completed</div>
+      </div>
+      <div class="w-px h-10 bg-[color:var(--border)]"></div>
+      <div>
+        <div class="text-3xl font-semibold text-[color:var(--ink)]">24m</div>
+        <div class="text-[color:var(--muted)]">POS data (BladeGen)</div>
+      </div>
+      <div class="w-px h-10 bg-[color:var(--border)]"></div>
+      <div>
+        <div class="text-3xl font-semibold text-[color:var(--ink)]">2025/26</div>
+        <div class="text-[color:var(--muted)]">Academic year</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-20">
+      <div class="section-eyebrow">About the system</div>
+      <h2 class="section-title mx-auto">Smarter analytics, less manual work.</h2>
+      <p class="section-sub mx-auto">Replace manual report building with an AI-driven business assistant that adapts to your data structures.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-5 gap-8 items-start mb-24">
+      <div class="lg:col-span-3 space-y-5">
+        <p class="text-lg leading-relaxed text-[color:var(--ink)]">
+          Mid- to high-end F&amp;B businesses collect large volumes of POS data daily — yet most of it is used only for basic reporting. There is no automated KPI discovery, and strategy creation remains manual and fragmented. The result: businesses are <strong>data-rich but insight-poor</strong>, relying on intuition instead of intelligence.
+        </p>
+        <p class="leading-relaxed text-[color:var(--muted-2)]">
+          Contexta is an AI-powered analytics platform that automates data extraction, analysis, forecasting, and sentiment insights to support faster, affordable, and smarter business decisions. Built in collaboration with <strong>BladeGen Tech (Pvt) Ltd</strong>, the system integrates four core components: automated product categorisation, KPI extraction with dynamic charts, multi-label sentiment analysis, and context-aware predictive modelling.
+        </p>
+      </div>
+
+      <div class="lg:col-span-2 card-soft">
+        <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)] mb-4">At a glance</div>
+        <ul class="space-y-3 text-sm">
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>Four modules</strong> — Categorisation, KPIs, Sentiment, Forecasting</span></li>
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>RAG-enhanced</strong> business intelligence</span></li>
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>Multi-Agent AI</strong> decision support</span></li>
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>BladeGen Tech</strong> industry partnership (NDA)</span></li>
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>Multi-lingual NLP</strong> incl. Sinhala</span></li>
+          <li class="flex items-start gap-3"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i><span><strong>Confidence-based</strong> flagging, no forced predictions</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Feature cards -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="card">
+        <div class="feature-icon blue"><i class="bi bi-diagram-3"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Automated Product Categorisation</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">Web scraping, OCR, and agentic AI auto-categorise POS items across vendors and cuisines — replacing manual mapping and adapting to changing menu formats.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon purple"><i class="bi bi-graph-up-arrow"></i></div>
+        <h4 class="font-semibold text-lg mb-2">KPI Recommendation &amp; SQL Engine</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">A hybrid recommender discovers KPIs from data columns (not assumed), runs statistical gatekeeping, generates SQL, and suggests the right visualisation — traceable, never black-box.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon green"><i class="bi bi-chat-square-quote"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Multi-Label Sentiment Analysis</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">Fine-tuned BERT identifies mixed Positive / Negative / Neutral sentiment in Sinhala and English Google reviews, with confidence scores and Agentic AI for personalised replies.</p>
+      </div>
+      <div class="card">
+        <div class="feature-icon orange"><i class="bi bi-bar-chart-line"></i></div>
+        <h4 class="font-semibold text-lg mb-2">ATHENA — Context-Aware Forecasting</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">Sales forecasting that combines POS data with weather, holidays, and seasonality — then explains <em>why</em> trends happen and recommends what to do next, not just numbers.</p>
+      </div>
+    </div>
+
+    <!-- Tech strip -->
+    <div class="mt-24">
+      <div class="text-center text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)] mb-6">Built with</div>
+      <div class="flex flex-wrap justify-center gap-3">
+        <div class="tech-chip"><i class="bi bi-code-slash"></i>Python</div>
+        <div class="tech-chip"><i class="bi bi-code-slash"></i>React</div>
+        <div class="tech-chip"><i class="bi bi-cpu"></i>PyTorch</div>
+        <div class="tech-chip"><i class="bi bi-lightning-charge"></i>XGBoost</div>
+        <div class="tech-chip"><i class="bi bi-lightning-charge"></i>LightGBM</div>
+        <div class="tech-chip"><i class="bi bi-graph-up"></i>Prophet</div>
+        <div class="tech-chip"><i class="bi bi-bezier"></i>scikit-learn</div>
+        <div class="tech-chip"><i class="bi bi-chat-text"></i>RoBERTa</div>
+        <div class="tech-chip"><i class="bi bi-globe"></i>BeautifulSoup</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOCUMENTS ============ -->
+<section id="documents" class="py-28" style="background: var(--panel);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Deliverables</div>
+      <h2 class="section-title mx-auto">Documents.</h2>
+      <p class="section-sub mx-auto">Project reports, deliverables, and module write-ups — available to download.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-file-earmark-ruled"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Project Charter</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Scope statement, objectives overview, approximate schedule, and project participants.</p>
+        <a href="docs/project-charter.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-file-earmark-text"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Project Proposal</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Goals, objectives, important dates, milestones and requirements to start and complete the project.</p>
+        <a href="docs/project-proposal.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-file-earmark-richtext"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Research Paper</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Literature review, methodology, analysis, interpretation, and argument based on independent research.</p>
+        <a href="docs/research-paper.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Final Thesis</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">The proposed solution to the research question, finalised after completing the research.</p>
+        <a href="docs/final-thesis.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-clipboard-check"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Status Documents</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Project progress within specific time periods, compared against the project plan checklist.</p>
+        <a href="docs/status-documents.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-journal-bookmark"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Research Logbook</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Detailed log of research activities, experiments, observations and weekly progress notes.</p>
+        <a href="docs/research-logbook.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-briefcase"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Business Plan</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Valuable when commercialising the product to the real world market as an organisational entity.</p>
+        <a href="docs/business-plan.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-list-check"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Checklist Documents</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Submission checklists for each assessment stage with tracked completion status.</p>
+        <a href="docs/checklist-documents.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-file-earmark-plus"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Module Reports (×4)</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Individual in-depth reports for each module — M01, M02, M03, M04.</p>
+        <a href="docs/module-reports.zip" download class="doc-btn"><i class="bi bi-download"></i> Download ZIP</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRESENTATIONS ============ -->
+<section id="presentations" class="py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Slide decks</div>
+      <h2 class="section-title mx-auto">Presentations.</h2>
+      <p class="section-sub mx-auto">Assessment slide decks across each milestone of the project.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-lightbulb"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Proposal Presentation</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">Initial presentation with overview of the research problem.</p>
+        <a href="docs/proposal-presentation.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-speedometer"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Progress Presentation 1</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">50% project completion review.</p>
+        <a href="docs/progress-presentation-1.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-speedometer2"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Progress Presentation 2</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">100% project completion review.</p>
+        <a href="docs/progress-presentation-2.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+      </div>
+      <div class="doc-card">
+        <div class="doc-icon"><i class="bi bi-trophy"></i></div>
+        <h4 class="font-semibold text-lg mb-2">Final Presentation</h4>
+        <p class="text-sm mb-4 text-[color:var(--muted-2)]">100% completion with the deployed solution.</p>
+        <a href="docs/final-presentation.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MILESTONES ============ -->
+<section id="milestones" class="py-28" style="background: var(--panel);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Schedule</div>
+      <h2 class="section-title mx-auto">Milestones.</h2>
+      <p class="section-sub mx-auto">Assessment timeline and mark allocation.</p>
+    </div>
+
+    <div class="timeline max-w-3xl mx-auto">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">October 2025</div>
+          <div class="tl-title">Project Proposal (Presentation + Report)</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 12% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">December 2025</div>
+          <div class="tl-title">Progress Presentation — 1</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 15% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">February 2026</div>
+          <div class="tl-title">Research Paper Submission</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 10% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">March 2026</div>
+          <div class="tl-title">Progress Presentation — 2</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 18% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">April 2026</div>
+          <div class="tl-title">Final Report (Thesis)</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 19% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">December 2025 &amp; March 2026</div>
+          <div class="tl-title">Status Documents 1 &amp; 2</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 2% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">May 2026</div>
+          <div class="tl-title">Log Books</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 2% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">May 2026</div>
+          <div class="tl-title">Final Presentation + Viva</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 20% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span><span class="tl-badge indiv">Individual</span></div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-date">May 2026</div>
+          <div class="tl-title">Website Development</div>
+          <span class="tl-mark"><i class="bi bi-bookmark-star-fill"></i> 2% mark allocation</span>
+          <div class="tl-badges"><span class="tl-badge group">Group</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DOMAIN ============ -->
+<section id="domain" class="py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Research</div>
+      <h2 class="section-title mx-auto">Domain.</h2>
+      <p class="section-sub mx-auto">Project domain, research foundations, and technical approach.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-4 gap-8">
+      <div class="lg:col-span-1">
+        <div class="sticky top-24 card-soft" style="padding: 12px;">
+          <button class="tab-btn active" data-tab="lit">Literature Survey</button>
+          <button class="tab-btn" data-tab="prob">Research Problem</button>
+          <button class="tab-btn" data-tab="gap">Research Gap</button>
+          <button class="tab-btn" data-tab="obj">Research Objectives</button>
+          <button class="tab-btn" data-tab="method">Methodology</button>
+          <button class="tab-btn" data-tab="tech">Technologies</button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-3">
+        <!-- Literature Survey -->
+        <div class="tab-panel active" data-panel="lit">
+          <h3 class="text-3xl font-semibold mb-5">Literature Survey</h3>
+          <p class="mb-4 leading-relaxed text-[color:var(--muted-2)]">
+            Traditional business intelligence relies on static templates and manual rules. These older methods miss nuanced trends and handle unstructured data poorly.
+          </p>
+          <p class="mb-4 leading-relaxed text-[color:var(--muted-2)]">
+            Automated classification models improve accuracy but often depend on local, static data files instead of live, context-aware information. When evaluating customer feedback, historical sentiment analysis models struggle with mixed emotions and negation, typically restricting outputs to a single label.
+          </p>
+          <p class="leading-relaxed text-[color:var(--muted-2)]">
+            For demand planning, hybrid pipelines capture complex patterns better than basic methods, yet many lack operational integration or clear explanations for why a decision was made.
+          </p>
+        </div>
+
+        <!-- Research Problem -->
+        <div class="tab-panel" data-panel="prob">
+          <h3 class="text-3xl font-semibold mb-5">Research Problem</h3>
+          <p class="mb-4 leading-relaxed text-[color:var(--muted-2)]">
+            When managing analytics workflows, you face inefficiencies manually rebuilding KPIs, dealing with inconsistent naming conventions, and trying to interpret unstructured feedback.
+          </p>
+          <p class="leading-relaxed text-[color:var(--muted-2)]">
+            Existing template-based automations lack the flexibility to handle changes in data structures and fail to provide contextual reasoning. You are missing an intelligent, automated system that uses live online data for product categorisation, processes complex sentiments in reviews, and translates predictions into risk-aware decisions for your business.
+          </p>
+        </div>
+
+        <!-- Research Gap -->
+        <div class="tab-panel" data-panel="gap">
+          <h3 class="text-3xl font-semibold mb-5">Research Gap</h3>
+          <p class="mb-4 leading-relaxed text-[color:var(--muted-2)]">
+            Current analytical solutions isolate different stages of your data pipeline. Automated product categorisation rarely uses dynamic web scraping to update its knowledge base.
+          </p>
+          <p class="mb-4 leading-relaxed text-[color:var(--muted-2)]">
+            Sentiment analysis systems lack multi-lingual support, particularly for low-resource languages like Sinhala, and fail to integrate with AI for real-time response generation.
+          </p>
+          <p class="leading-relaxed text-[color:var(--muted-2)]">
+            Forecasting systems frequently produce metrics without calibrated uncertainty or human-in-the-loop explainability, leaving you without clear guidance during volatile periods.
+          </p>
+        </div>
+
+        <!-- Research Objectives -->
+        <div class="tab-panel" data-panel="obj">
+          <h3 class="text-3xl font-semibold mb-5">Research Objectives</h3>
+          <div class="card-soft mb-6" style="border-left: 4px solid var(--accent);">
+            <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)] mb-2">Main objective</div>
+            <p class="leading-relaxed">Design a Context-Aware BI System that adapts to different business contexts and delivers personalised insights — transitioning from static automation to intelligent insight generation.</p>
+          </div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--muted)] mb-4">Specific objectives</div>
+          <div class="space-y-5">
+            <div class="flex gap-4"><div class="text-[color:var(--accent)] font-semibold text-xl flex-shrink-0">01</div><div><h5 class="font-semibold mb-1">Automate menu categorisation</h5><p class="text-sm text-[color:var(--muted-2)]">Use machine learning and web scraping to classify products dynamically without manual mapping.</p></div></div>
+            <div class="flex gap-4"><div class="text-[color:var(--accent)] font-semibold text-xl flex-shrink-0">02</div><div><h5 class="font-semibold mb-1">Extract KPIs automatically</h5><p class="text-sm text-[color:var(--muted-2)]">Detect relevant KPIs from raw data and recommend the best chart types for each context.</p></div></div>
+            <div class="flex gap-4"><div class="text-[color:var(--accent)] font-semibold text-xl flex-shrink-0">03</div><div><h5 class="font-semibold mb-1">Multi-lingual sentiment classification</h5><p class="text-sm text-[color:var(--muted-2)]">Use a multi-lingual language model to classify mixed sentiments and generate tailored responses.</p></div></div>
+            <div class="flex gap-4"><div class="text-[color:var(--accent)] font-semibold text-xl flex-shrink-0">04</div><div><h5 class="font-semibold mb-1">Strategic forecasting module</h5><p class="text-sm text-[color:var(--muted-2)]">Build a forecasting module that translates numerical predictions into strategic actions.</p></div></div>
+          </div>
+        </div>
+
+        <!-- Methodology -->
+        <div class="tab-panel" data-panel="method">
+          <h3 class="text-3xl font-semibold mb-5">Methodology</h3>
+          <p class="mb-6 leading-relaxed text-[color:var(--muted-2)]">
+            The system ingests raw Point of Sale (POS) data, customer reviews, and external context like weather or calendars, then routes them through a layered pipeline.
+          </p>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div class="card">
+              <div class="text-xs font-semibold text-[color:var(--accent)] mb-2">01 · Categorise</div>
+              <p class="text-sm text-[color:var(--muted-2)]">NLP and fuzzy matching dynamically recognise and categorise products by scraping vendor websites.</p>
+            </div>
+            <div class="card">
+              <div class="text-xs font-semibold text-[color:var(--accent)] mb-2">02 · Detect KPIs</div>
+              <p class="text-sm text-[color:var(--muted-2)]">Statistical and contextual analysis detects potential KPIs, suggesting the most useful groupings and visualisations.</p>
+            </div>
+            <div class="card">
+              <div class="text-xs font-semibold text-[color:var(--accent)] mb-2">03 · Analyse Sentiment</div>
+              <p class="text-sm text-[color:var(--muted-2)]">A fine-tuned multi-lingual language model identifies sentiment intensity and triggers AI to output tailored replies.</p>
+            </div>
+            <div class="card">
+              <div class="text-xs font-semibold text-[color:var(--accent)] mb-2">04 · Forecast &amp; Recommend</div>
+              <p class="text-sm text-[color:var(--muted-2)]">Time-series forecasting models predict future sales, apply anomaly detection, and translate forecasts into natural language recommendations.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technologies -->
+        <div class="tab-panel" data-panel="tech">
+          <h3 class="text-3xl font-semibold mb-5">Technologies</h3>
+          <p class="mb-6 leading-relaxed text-[color:var(--muted-2)]">A balanced stack across backend modelling, frontend interaction, and ML infrastructure.</p>
+          <div class="flex flex-wrap gap-3">
+            <div class="tech-chip"><i class="bi bi-code-slash"></i>Python</div>
+            <div class="tech-chip"><i class="bi bi-code-slash"></i>React</div>
+            <div class="tech-chip"><i class="bi bi-cpu"></i>PyTorch</div>
+            <div class="tech-chip"><i class="bi bi-lightning-charge"></i>XGBoost</div>
+            <div class="tech-chip"><i class="bi bi-lightning-charge"></i>LightGBM</div>
+            <div class="tech-chip"><i class="bi bi-graph-up"></i>Prophet</div>
+            <div class="tech-chip"><i class="bi bi-bezier"></i>scikit-learn</div>
+            <div class="tech-chip"><i class="bi bi-chat-text"></i>RoBERTa</div>
+            <div class="tech-chip"><i class="bi bi-globe"></i>BeautifulSoup</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACHIEVEMENTS ============ -->
+<section id="achievements" class="py-28" style="background: var(--panel);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Recognition</div>
+      <h2 class="section-title mx-auto">Achievements.</h2>
+      <p class="section-sub mx-auto">Competitions, conferences, and industry collaboration.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="achieve-card">
+        <div class="feature-icon orange"><i class="bi bi-trophy-fill"></i></div>
+        <h4 class="font-semibold text-lg mb-2">SLASSCOM National Ingenuity Awards 2026</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">Targeted submission to SNIA 2026 — Sri Lanka's flagship innovation competition for technology and applied AI.</p>
+      </div>
+      <div class="achieve-card">
+        <div class="feature-icon green"><i class="bi bi-award-fill"></i></div>
+        <h4 class="font-semibold text-lg mb-2">BladeGen Tech Industry Partnership</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">Signed agreement with BladeGen Tech (Pvt) Ltd for 24 months of POS data under NDA, plus an upcoming pilot deployment in a real operational environment.</p>
+      </div>
+      <div class="achieve-card">
+        <div class="feature-icon purple"><i class="bi bi-star-fill"></i></div>
+        <h4 class="font-semibold text-lg mb-2">100% Project Completion</h4>
+        <p class="text-sm text-[color:var(--muted-2)]">All four modules built, integrated, and validated against real-world F&amp;B data — entering the pilot, retraining, and operational hardening phase.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMERCIALISATION ============ -->
+<section id="commercialisation" class="py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Commercialisation</div>
+      <h2 class="section-title mx-auto">Built for the F&amp;B market.</h2>
+      <p class="section-sub mx-auto">A strategy-first analytics platform for non-data-native organisations.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-5 mb-12">
+      <div class="card-soft">
+        <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)] mb-3">Target market</div>
+        <p class="text-sm leading-relaxed text-[color:var(--muted-2)]">F&amp;B retailers, supermarkets, distributors, e-commerce platforms, and restaurant chains.</p>
+      </div>
+      <div class="card-soft">
+        <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)] mb-3">Customer profile</div>
+        <p class="text-sm leading-relaxed text-[color:var(--muted-2)]">Mid- to high-end business owners or Boards of Directors with limited in-house data capabilities — no dedicated team or a beginner-level team embedded in IT.</p>
+      </div>
+      <div class="card-soft">
+        <div class="text-xs font-semibold uppercase tracking-wider text-[color:var(--accent)] mb-3">Why we are unique</div>
+        <ul class="text-sm space-y-1.5 text-[color:var(--muted-2)]">
+          <li>· Strategy-first, not dashboard-first</li>
+          <li>· Multi-source intelligence, unified</li>
+          <li>· Context-aware insights</li>
+          <li>· Built for non-data-native organisations</li>
+          <li>· Actionable outputs &amp; affordability</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="text-center mb-8">
+      <h3 class="text-2xl font-semibold">Investment recovery plans</h3>
+      <p class="text-sm text-[color:var(--muted-2)] mt-2">Cloud cost: ~$300–500/month (~90,000–150,000 LKR)</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+      <div class="card">
+        <div class="text-sm font-semibold text-[color:var(--muted)] uppercase tracking-wider mb-2">Basic</div>
+        <div class="text-4xl font-bold mb-1">$200<span class="text-base font-normal text-[color:var(--muted)]">/month</span></div>
+        <ul class="text-sm space-y-2 mt-5 text-[color:var(--muted-2)]">
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Automated product categorisation</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Limited KPI recommendations</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>SQL query generation (up to 10 KPIs/month)</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Standard support</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,113,227,0.08);">
+        <div class="flex items-center justify-between mb-2">
+          <div class="text-sm font-semibold text-[color:var(--accent)] uppercase tracking-wider">Pro</div>
+          <span class="text-xs font-semibold px-2 py-1 rounded-full bg-[color:var(--accent-soft)] text-[color:var(--accent)]">Popular</span>
+        </div>
+        <div class="text-4xl font-bold mb-1">$500<span class="text-base font-normal text-[color:var(--muted)]">/month</span></div>
+        <ul class="text-sm space-y-2 mt-5 text-[color:var(--muted-2)]">
+          <li class="flex gap-2"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i>Full product categorisation across vendors</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i>Advanced KPI recommendations</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i>Unlimited SQL query generation</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle-fill text-[color:var(--accent)] mt-0.5"></i>Priority support</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="text-sm font-semibold text-[color:var(--muted)] uppercase tracking-wider mb-2">Enterprise</div>
+        <div class="text-4xl font-bold mb-1">$900+<span class="text-base font-normal text-[color:var(--muted)]">/month</span></div>
+        <ul class="text-sm space-y-2 mt-5 text-[color:var(--muted-2)]">
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Complete categorisation &amp; strategy generation</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Custom KPI design &amp; metadata analysis</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>Internal review &amp; sentiment analysis</li>
+          <li class="flex gap-2"><i class="bi bi-check-circle text-[color:var(--accent)] mt-0.5"></i>24/7 premium support</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEAM ============ -->
+<section id="team" class="py-28" style="background: var(--panel);">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">The team</div>
+      <h2 class="section-title mx-auto">Researchers.</h2>
+      <p class="section-sub mx-auto">Meet the team behind Group 25-26J-117.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
+      <div class="team-card">
+        <div class="team-avatar a1">A</div>
+        <div class="team-body">
+          <h4>Adikari A. I</h4>
+          <div class="role">IT22000194 · KPI Engine</div>
+          <p>Driving Data-Driven Decisions: Intelligent KPI Recommendation Engine with Visualisation Suggestion and Automated SQL Generation.</p>
+          <div class="social-row">
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar a2">V</div>
+        <div class="team-body">
+          <h4>Vinushan V</h4>
+          <div class="role">IT22319760 · ATHENA</div>
+          <p>ATHENA: Context-Aware Sales Forecasting and Prescriptive Optimization in Retail.</p>
+          <div class="social-row">
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar a3">N</div>
+        <div class="team-body">
+          <h4>Anupama S K D N</h4>
+          <div class="role">IT22323552 · Sentiment</div>
+          <p>Multi-labelled &amp; Multi-lingual Sentiment Analysis using BERT, integrating Agentic AI for personalised responses.</p>
+          <div class="social-row">
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar a4">K</div>
+        <div class="team-body">
+          <h4>Wagoda Pathirage V K</h4>
+          <div class="role">IT22349910 · Categorisation</div>
+          <p>Automating product categorisation using classification models, web scraping, and agentic AI for dynamic, context-aware updates.</p>
+          <div class="social-row">
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+      <div class="team-card">
+        <div class="team-avatar sup"><i class="bi bi-person-badge" style="font-size:56px;"></i></div>
+        <div class="team-body">
+          <h4>Ms. Jenny Krishara</h4>
+          <div class="role">Supervisor</div>
+          <p>Senior Lecturer, Faculty of Computing — SLIIT.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar sup"><i class="bi bi-person-badge" style="font-size:56px;"></i></div>
+        <div class="team-body">
+          <h4>Dr. Dinuka Rajendran</h4>
+          <div class="role">Co-Supervisor</div>
+          <p>Senior Lecturer, Faculty of Computing — SLIIT.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="py-28 bg-white">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <div class="section-eyebrow">Get in touch</div>
+      <h2 class="section-title mx-auto">Contact.</h2>
+      <p class="section-sub mx-auto">Reach out to Research Group 25-26J-117.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div class="contact-info">
+          <div class="contact-info-icon"><i class="bi bi-geo-alt"></i></div>
+          <div>
+            <h4 class="font-semibold text-base mb-1">Location</h4>
+            <p class="text-sm text-[color:var(--muted-2)]">SLIIT Malabe Campus<br>New Kandy Road, Malabe 10115, Sri Lanka</p>
+          </div>
+        </div>
+        <div class="contact-info">
+          <div class="contact-info-icon"><i class="bi bi-envelope"></i></div>
+          <div>
+            <h4 class="font-semibold text-base mb-1">Email</h4>
+            <p class="text-sm text-[color:var(--muted-2)]">group.25-26j-117@my.sliit.lk</p>
+          </div>
+        </div>
+        <div class="contact-info">
+          <div class="contact-info-icon"><i class="bi bi-telephone"></i></div>
+          <div>
+            <h4 class="font-semibold text-base mb-1">Call</h4>
+            <p class="text-sm text-[color:var(--muted-2)]">+94 11 754 4801</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form rounded-[22px] p-7 space-y-3" style="background: var(--panel);" onsubmit="handleContact(event)">
+        <div class="grid sm:grid-cols-2 gap-3">
+          <input type="text" placeholder="Your name" id="c-name" required />
+          <input type="email" placeholder="Your email" id="c-email" required />
+        </div>
+        <input type="text" placeholder="Subject" id="c-subject" required />
+        <textarea rows="6" placeholder="Message" id="c-message" required></textarea>
+        <div class="text-center pt-2">
+          <button type="submit" class="submit-btn">Send Message</button>
+        </div>
+        <div id="c-status" class="text-center text-sm text-[color:var(--accent)]" style="display:none;">Your message has been prepared. Thank you!</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="pt-16 pb-8">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-12 gap-10 mb-12">
+      <div class="md:col-span-5">
+        <h3 class="text-xl font-semibold text-[color:var(--ink)] mb-3">Contexta</h3>
+        <p class="text-sm leading-relaxed">
+          Final Year Research Project<br>
+          Research Group 25-26J-117<br>
+          Sri Lanka Institute of Information Technology
+        </p>
+      </div>
+      <div class="md:col-span-3">
+        <h5>Useful Links</h5>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#documents">Documents</a></li>
+          <li><a href="#presentations">Presentations</a></li>
+          <li><a href="#milestones">Milestones</a></li>
+          <li><a href="#team">Team</a></li>
+        </ul>
+      </div>
+      <div class="md:col-span-4">
+        <h5>Modules</h5>
+        <ul class="space-y-2 text-sm">
+          <li>Automated Product Categorisation</li>
+          <li>KPI Extraction &amp; Dynamic Charts</li>
+          <li>Multi-Label Sentiment Analysis</li>
+          <li>Context-Aware Predictive Modelling</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-[color:var(--border-soft)] pt-6 text-center text-xs">
+      © 2026 Research Group 25-26J-117 · SLIIT Faculty of Computing
+    </div>
+  </div>
+</footer>
+
+<a id="back-to-top" href="#hero"><i class="bi bi-arrow-up"></i></a>
+
+<script>
+  const header = document.getElementById('header');
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 20) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+    if (window.scrollY > 400) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  });
+
+  const navLinks = document.querySelectorAll('.nav-menu a');
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY + 120;
+    sections.forEach(sec => {
+      if (scrollY >= sec.offsetTop && scrollY < sec.offsetTop + sec.offsetHeight) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.nav-menu a[href="#${sec.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  });
+
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    document.body.classList.toggle('mobile-menu-open');
+  });
+  navLinks.forEach(link => link.addEventListener('click', () => {
+    document.body.classList.remove('mobile-menu-open');
+  }));
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelector(`.tab-panel[data-panel="${tab}"]`).classList.add('active');
+    });
+  });
+
+  function handleContact(e) {
+    e.preventDefault();
+    const name = document.getElementById('c-name').value;
+    const email = document.getElementById('c-email').value;
+    const subject = document.getElementById('c-subject').value;
+    const message = document.getElementById('c-message').value;
+    const body = `${message}\n\n—\n${name}\n${email}`;
+    window.location.href = `mailto:group.25-26j-117@my.sliit.lk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    document.getElementById('c-status').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
