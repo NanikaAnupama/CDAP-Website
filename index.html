@@ -185,6 +185,83 @@
   }
   .doc-btn:hover { background: var(--accent); color: #fff; }
   .doc-btn.disabled { background: var(--panel); color: var(--muted); cursor: not-allowed; pointer-events: none; }
+  .doc-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+  .doc-actions .doc-btn,
+  .doc-actions .doc-btn-secondary { margin-top: 0; cursor: pointer; }
+  .doc-btn-secondary {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px;
+    background: var(--panel); color: var(--ink);
+    border-radius: 980px; font-weight: 500; font-size: 13px;
+    transition: all .2s ease; align-self: flex-start;
+    border: 1px solid var(--border-soft);
+  }
+  .doc-btn-secondary:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Document viewer modal */
+  .viewer-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 9998; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .viewer-modal.active { display: flex; animation: fadeIn .25s ease; }
+  .viewer-content {
+    background: var(--paper); border-radius: 22px;
+    width: 100%; max-width: 1100px; height: 90vh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25);
+  }
+  .viewer-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .viewer-header h3 {
+    flex: 1; font-size: 15px; font-weight: 600; margin: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .viewer-icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: var(--panel); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink); font-size: 14px; flex-shrink: 0;
+    transition: background .2s ease;
+  }
+  .viewer-icon-btn:hover { background: var(--border); }
+  .viewer-body { flex: 1; position: relative; overflow: hidden; background: var(--panel-2); }
+  .viewer-frame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+  .zip-list { padding: 22px; overflow-y: auto; height: 100%; }
+  .zip-list-head {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 600; margin-bottom: 14px;
+  }
+  .zip-file {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; background: var(--paper);
+    border-radius: 14px; margin-bottom: 8px;
+    cursor: pointer; transition: all .2s ease;
+    border: 1px solid var(--border-soft);
+  }
+  .zip-file:hover { border-color: var(--accent); transform: translateX(2px); }
+  .zip-file-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .zip-file-name {
+    flex: 1; font-size: 14px; font-weight: 500; color: var(--ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .zip-file-size { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .zip-file-eye { color: var(--accent); flex-shrink: 0; opacity: 0.7; }
+  .viewer-msg {
+    text-align: center; padding: 48px 24px;
+    color: var(--muted-2); font-size: 14px;
+  }
+  .viewer-msg p { margin-bottom: 18px; }
 
   /* Tech chip */
   .tech-chip {
@@ -417,7 +494,7 @@
       </div>
       <div class="w-px h-10 bg-[color:var(--border)]"></div>
       <div>
-        <div class="text-3xl font-semibold text-[color:var(--ink)]">24m</div>
+        <div class="text-3xl font-semibold text-[color:var(--ink)]">24mo</div>
         <div class="text-[color:var(--muted)]">POS data (BladeGen)</div>
       </div>
       <div class="w-px h-10 bg-[color:var(--border)]"></div>
@@ -517,37 +594,55 @@
         <div class="doc-icon"><i class="bi bi-file-earmark-ruled"></i></div>
         <h4 class="font-semibold text-lg mb-2">Project Charter</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Scope statement, objectives overview, approximate schedule, and project participants.</p>
-        <a href="docs/project-charter.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/project-charter.pdf', 'Project Charter', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/project-charter.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-file-earmark-text"></i></div>
         <h4 class="font-semibold text-lg mb-2">Project Proposal</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Goals, objectives, important dates, milestones and requirements to start and complete the project.</p>
-        <a href="docs/project-proposal.zip" download class="doc-btn"><i class="bi bi-download"></i> Download ZIP</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/project-proposal.zip', 'Project Proposal', 'zip')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/project-proposal.zip" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download ZIP</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-file-earmark-richtext"></i></div>
         <h4 class="font-semibold text-lg mb-2">Research Paper</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Literature review, methodology, analysis, interpretation, and argument based on independent research.</p>
-        <a href="docs/research-paper.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download PDF</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/research-paper.pdf', 'Research Paper', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/research-paper.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-file-earmark-pdf"></i></div>
         <h4 class="font-semibold text-lg mb-2">Final Thesis</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">The proposed solution to the research question, finalised after completing the research.</p>
-        <a href="docs/final-thesis.zip" download class="doc-btn"><i class="bi bi-download"></i> Download ZIP</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/final-thesis.zip', 'Final Thesis', 'zip')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/final-thesis.zip" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download ZIP</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-journal-bookmark"></i></div>
         <h4 class="font-semibold text-lg mb-2">Research Logbook</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Detailed log of research activities, experiments, observations and weekly progress notes.</p>
-        <a href="docs/research-logbook.zip" download class="doc-btn"><i class="bi bi-download"></i> Download ZIP</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/research-logbook.zip', 'Research Logbook', 'zip')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/research-logbook.zip" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download ZIP</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-list-check"></i></div>
         <h4 class="font-semibold text-lg mb-2">Checklist Documents</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Submission checklists for each assessment stage with tracked completion status.</p>
-        <a href="docs/checklist-documents.zip" download class="doc-btn"><i class="bi bi-download"></i> Download ZIP</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/checklist-documents.zip', 'Checklist Documents', 'zip')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/checklist-documents.zip" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download ZIP</a>
+        </div>
       </div>
     </div>
   </div>
@@ -567,25 +662,37 @@
         <div class="doc-icon"><i class="bi bi-lightbulb"></i></div>
         <h4 class="font-semibold text-lg mb-2">Proposal Presentation</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">Initial presentation with overview of the research problem.</p>
-        <a href="docs/proposal-presentation.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/proposal-presentation.pdf', 'Proposal Presentation', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/proposal-presentation.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-speedometer"></i></div>
         <h4 class="font-semibold text-lg mb-2">Progress Presentation 1</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">50% project completion review.</p>
-        <a href="docs/progress-presentation-1.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/progress-presentation-1.pdf', 'Progress Presentation 1', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/progress-presentation-1.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-speedometer2"></i></div>
         <h4 class="font-semibold text-lg mb-2">Progress Presentation 2</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">100% project completion review.</p>
-        <a href="docs/progress-presentation-2.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/progress-presentation-2.pdf', 'Progress Presentation 2', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/progress-presentation-2.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
       <div class="doc-card">
         <div class="doc-icon"><i class="bi bi-trophy"></i></div>
         <h4 class="font-semibold text-lg mb-2">Final Presentation</h4>
         <p class="text-sm mb-4 text-[color:var(--muted-2)]">100% completion with the deployed solution.</p>
-        <a href="docs/final-presentation.pdf" download class="doc-btn"><i class="bi bi-download"></i> Download</a>
+        <div class="doc-actions">
+          <button type="button" class="doc-btn" onclick="viewDocument('docs/final-presentation.pdf', 'Final Presentation', 'pdf')"><i class="bi bi-eye"></i> View</button>
+          <a href="docs/final-presentation.pdf" download class="doc-btn-secondary"><i class="bi bi-download"></i> Download</a>
+        </div>
       </div>
     </div>
   </div>
@@ -1088,6 +1195,23 @@
 
 <a id="back-to-top" href="#hero"><i class="bi bi-arrow-up"></i></a>
 
+<!-- ============ DOCUMENT VIEWER MODAL ============ -->
+<div id="viewer-modal" class="viewer-modal" onclick="if(event.target===this)closeViewer()">
+  <div class="viewer-content">
+    <div class="viewer-header">
+      <button type="button" id="viewer-back" class="viewer-icon-btn" style="display:none;" onclick="backToZipList()" aria-label="Back to file list"><i class="bi bi-arrow-left"></i></button>
+      <h3 id="viewer-title">Document Viewer</h3>
+      <button type="button" class="viewer-icon-btn" onclick="closeViewer()" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="viewer-body">
+      <div id="zip-list" class="zip-list" style="display:none;"></div>
+      <iframe id="viewer-frame" class="viewer-frame" style="display:none;" title="Document preview"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
 <script>
   const header = document.getElementById('header');
   const backToTop = document.getElementById('back-to-top');
@@ -1138,6 +1262,192 @@
     window.location.href = `mailto:group.25-26j-117@my.sliit.lk?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     document.getElementById('c-status').style.display = 'block';
   }
+
+  // ===== Document viewer =====
+  let currentZip = null;
+  let currentZipTitle = '';
+  let currentBlobUrl = null;
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[s]);
+  }
+  function iconForExt(ext) {
+    if (ext === 'pdf') return 'file-earmark-pdf';
+    if (['doc','docx'].includes(ext)) return 'file-earmark-word';
+    if (['xls','xlsx','csv'].includes(ext)) return 'file-earmark-spreadsheet';
+    if (['ppt','pptx'].includes(ext)) return 'file-earmark-slides';
+    if (['png','jpg','jpeg','gif','svg','webp'].includes(ext)) return 'file-earmark-image';
+    if (['txt','md','log'].includes(ext)) return 'file-earmark-text';
+    if (['zip','rar','7z'].includes(ext)) return 'file-earmark-zip';
+    return 'file-earmark';
+  }
+  function mimeForExt(ext) {
+    const map = {
+      pdf:'application/pdf', png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg',
+      gif:'image/gif', svg:'image/svg+xml', webp:'image/webp',
+      txt:'text/plain', md:'text/plain', html:'text/html', json:'application/json', csv:'text/csv'
+    };
+    return map[ext] || 'application/octet-stream';
+  }
+  function formatBytes(bytes) {
+    if (!bytes) return '';
+    const units = ['B','KB','MB','GB'];
+    let i = 0, n = bytes;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
+  }
+  function clearBlob() {
+    if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+  }
+
+  async function viewDocument(href, title, kind) {
+    const modal = document.getElementById('viewer-modal');
+    const titleEl = document.getElementById('viewer-title');
+    const frame = document.getElementById('viewer-frame');
+    const list = document.getElementById('zip-list');
+    const back = document.getElementById('viewer-back');
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    titleEl.textContent = title;
+    back.style.display = 'none';
+    clearBlob();
+
+    if (kind === 'zip') {
+      frame.style.display = 'none';
+      list.style.display = 'block';
+      list.innerHTML = '<div class="viewer-msg">Loading archive…</div>';
+      currentZipTitle = title;
+      try {
+        const res = await fetch(href);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const buf = await res.arrayBuffer();
+        currentZip = await JSZip.loadAsync(buf);
+        renderZipList();
+      } catch (e) {
+        list.innerHTML = `<div class="viewer-msg"><p>Could not load archive.</p><p style="font-size:12px;">${escapeHtml(e.message)}</p></div>`;
+      }
+    } else {
+      list.style.display = 'none';
+      frame.style.display = 'block';
+      frame.src = href;
+    }
+  }
+
+  function renderZipList() {
+    if (!currentZip) return;
+    const list = document.getElementById('zip-list');
+    const frame = document.getElementById('viewer-frame');
+    const back = document.getElementById('viewer-back');
+    const titleEl = document.getElementById('viewer-title');
+
+    back.style.display = 'none';
+    titleEl.textContent = currentZipTitle;
+    frame.style.display = 'none';
+    frame.src = '';
+    clearBlob();
+    list.style.display = 'block';
+
+    const files = [];
+    currentZip.forEach((path, file) => { if (!file.dir) files.push({ path, file }); });
+    files.sort((a, b) => a.path.localeCompare(b.path));
+
+    if (!files.length) {
+      list.innerHTML = '<div class="viewer-msg">This archive is empty.</div>';
+      return;
+    }
+
+    let html = `<div class="zip-list-head">${files.length} file${files.length !== 1 ? 's' : ''} · click to view</div>`;
+    files.forEach(({ path, file }, idx) => {
+      const name = path.split('/').pop();
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      const size = (file._data && file._data.uncompressedSize) ? formatBytes(file._data.uncompressedSize) : '';
+      html += `<div class="zip-file" data-idx="${idx}">
+        <div class="zip-file-icon"><i class="bi bi-${iconForExt(ext)}"></i></div>
+        <div class="zip-file-name">${escapeHtml(name)}</div>
+        <div class="zip-file-size">${size}</div>
+        <i class="bi bi-eye zip-file-eye"></i>
+      </div>`;
+    });
+    list.innerHTML = html;
+    list.querySelectorAll('.zip-file').forEach(el => {
+      const { path, file } = files[parseInt(el.dataset.idx, 10)];
+      const name = path.split('/').pop();
+      el.addEventListener('click', () => viewZipFile(path, name));
+    });
+  }
+
+  async function viewZipFile(path, name) {
+    if (!currentZip) return;
+    const file = currentZip.file(path);
+    if (!file) return;
+    const ext = (name.split('.').pop() || '').toLowerCase();
+    const list = document.getElementById('zip-list');
+    const frame = document.getElementById('viewer-frame');
+    const back = document.getElementById('viewer-back');
+    const titleEl = document.getElementById('viewer-title');
+
+    back.style.display = 'flex';
+    titleEl.textContent = name;
+    clearBlob();
+
+    if (['doc','docx','xls','xlsx','ppt','pptx'].includes(ext)) {
+      frame.style.display = 'none';
+      list.style.display = 'block';
+      list.innerHTML = `
+        <div class="viewer-msg">
+          <i class="bi bi-file-earmark-arrow-down" style="font-size:44px; color:var(--muted); display:block; margin-bottom:14px;"></i>
+          <p>Office documents can't be previewed directly in the browser.</p>
+          <button type="button" class="doc-btn" id="zipDownloadBtn"><i class="bi bi-download"></i> Download ${escapeHtml(name)}</button>
+        </div>`;
+      document.getElementById('zipDownloadBtn').addEventListener('click', () => downloadZipFile(path, name));
+      return;
+    }
+
+    list.style.display = 'none';
+    frame.style.display = 'block';
+    frame.src = 'about:blank';
+    try {
+      const blob = await file.async('blob');
+      currentBlobUrl = URL.createObjectURL(new Blob([blob], { type: mimeForExt(ext) }));
+      frame.src = currentBlobUrl;
+    } catch (e) {
+      list.style.display = 'block';
+      frame.style.display = 'none';
+      list.innerHTML = `<div class="viewer-msg"><p>Could not open this file.</p><p style="font-size:12px;">${escapeHtml(e.message)}</p></div>`;
+    }
+  }
+
+  async function downloadZipFile(path, name) {
+    if (!currentZip) return;
+    const file = currentZip.file(path);
+    if (!file) return;
+    const blob = await file.async('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function backToZipList() { renderZipList(); }
+
+  function closeViewer() {
+    const modal = document.getElementById('viewer-modal');
+    const frame = document.getElementById('viewer-frame');
+    frame.src = '';
+    clearBlob();
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('viewer-modal').classList.contains('active')) {
+      closeViewer();
+    }
+  });
 </script>
 
 </body>
