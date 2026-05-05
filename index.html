@@ -268,6 +268,11 @@
   .team-avatar {
     aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
     font-weight: 600; font-size: 64px; color: #fff;
+    overflow: hidden; position: relative;
+  }
+  .team-avatar img {
+    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+    display: block;
   }
   .team-avatar.a1 { background: linear-gradient(135deg, #0071e3, #54a8ff); }
   .team-avatar.a2 { background: linear-gradient(135deg, #af52de, #d68dff); }
@@ -918,7 +923,7 @@
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
       <div class="team-card">
-        <div class="team-avatar a1">A</div>
+        <div class="team-avatar a1"><img src="images/researchers/ayathma.jpg" alt="Adikari A. I"></div>
         <div class="team-body">
           <h4>Adikari A. I</h4>
           <div class="role">IT22000194 · KPI Engine</div>
@@ -931,7 +936,7 @@
         </div>
       </div>
       <div class="team-card">
-        <div class="team-avatar a2">V</div>
+        <div class="team-avatar a2"><img src="images/researchers/vinushan.jpg" alt="Vinushan V"></div>
         <div class="team-body">
           <h4>Vinushan V</h4>
           <div class="role">IT22319760 · ATHENA</div>
@@ -944,7 +949,7 @@
         </div>
       </div>
       <div class="team-card">
-        <div class="team-avatar a3">N</div>
+        <div class="team-avatar a3"><img src="images/researchers/nandika.jpg" alt="Anupama S K D N"></div>
         <div class="team-body">
           <h4>Anupama S K D N</h4>
           <div class="role">IT22323552 · Sentiment</div>
@@ -957,7 +962,7 @@
         </div>
       </div>
       <div class="team-card">
-        <div class="team-avatar a4">K</div>
+        <div class="team-avatar a4"><img src="images/researchers/vishva.jpg" alt="Wagoda Pathirage V K"></div>
         <div class="team-body">
           <h4>Wagoda Pathirage V K</h4>
           <div class="role">IT22349910 · Categorisation</div>
@@ -973,7 +978,7 @@
 
     <div class="grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
       <div class="team-card">
-        <div class="team-avatar sup"><i class="bi bi-person-badge" style="font-size:56px;"></i></div>
+        <div class="team-avatar sup"><img src="images/researchers/jenny-krishara.jpg" alt="Ms. Jenny Krishara"></div>
         <div class="team-body">
           <h4>Ms. Jenny Krishara</h4>
           <div class="role">Supervisor</div>
@@ -981,7 +986,7 @@
         </div>
       </div>
       <div class="team-card">
-        <div class="team-avatar sup"><i class="bi bi-person-badge" style="font-size:56px;"></i></div>
+        <div class="team-avatar sup"><img src="images/researchers/dinuka.jpg" alt="Dr. Dinuka Rajendran"></div>
         <div class="team-body">
           <h4>Dr. Dinuka Rajendran</h4>
           <div class="role">Co-Supervisor</div>
